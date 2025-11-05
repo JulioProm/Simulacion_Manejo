@@ -1,12 +1,12 @@
 import tkinter as tk
 import pandas as pd
 import random
+from datetime import datetime
 from db_manager import DBManager
 
 class Cuestionario:
     def __init__(self, archivo_preguntas, db: DBManager):
         self.df = pd.read_csv(archivo_preguntas, encoding='latin1').fillna("")
-
         self.db = db
         self.errores = 0
 
@@ -45,7 +45,6 @@ class Cuestionario:
 
         def mostrar_pregunta():
             pregunta = self.df.iloc[num_preguntas[n_preg]]
-            
             texto_pregunta = pregunta['pregunta'].replace('\\n', '\n')
             label_pregunta.config(text=f"{n_preg + 1}. {texto_pregunta}")
             
@@ -64,12 +63,7 @@ class Cuestionario:
             if timer_id[0]:
                 root.after_cancel(timer_id[0])
 
-            # Evitar desbordamiento de índice
-            if n_preg >= len(num_preguntas):
-                print("⚠️ No hay más preguntas disponibles.")
-                return
-
-            # Verificar respuesta seleccionada (asegurando que haya algo elegido)
+            # Verificar respuesta
             try:
                 respuesta_correcta = self.df['respuesta'].iloc[num_preguntas[n_preg]-1]
                 respuesta_usuario = selected_option.get()
@@ -79,7 +73,6 @@ class Cuestionario:
                 print(f"⚠️ Índice fuera de rango en pregunta {n_preg}")
                 return
 
-            # Pasar a la siguiente pregunta
             n_preg += 1
 
             if n_preg < len(num_preguntas):
@@ -92,11 +85,14 @@ class Cuestionario:
         mostrar_pregunta()
         root.mainloop()
 
+    # ✅ Método FINALIZAR agregado
     def finalizar(self, root, usuario_id, tipo, total):
         puntos = 5 if tipo == "practica" else 2.5
         puntaje = ((total - self.errores) * puntos)
         porcentaje = (puntaje / (total * puntos)) * 100
         aprobado = 1 if porcentaje >= 75 else 0
+
+        # Registrar el intento en la base de datos (usa DBManager)
         self.db.registrar_intento(usuario_id, tipo, porcentaje, aprobado)
 
         resultado = "Aprobado ✅" if aprobado else "No aprobado ❌"

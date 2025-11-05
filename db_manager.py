@@ -57,12 +57,31 @@ class DBManager:
     # --------------------------------------------------------
     # Registrar un nuevo intento
     # --------------------------------------------------------
+       # --------------------------------------------------------
+    # Registrar un nuevo intento (corrige la llave foránea)
+    # --------------------------------------------------------
     def registrar_intento(self, id_usuario, tipo, calificacion, aprobado):
         cur = self.conn.cursor()
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Determinar id_simulador según el tipo
+        if tipo == "practica":
+            id_simulador = 1
+        elif tipo == "final":
+            id_simulador = 2
+        else:
+            id_simulador = None
+
+        if id_simulador is None:
+            print(" Tipo de simulador no válido.")
+            cur.close()
+            return
+
         cur.execute("""
-            INSERT INTO intentos (id_usuario, tipo, fecha, calificacion, aprobado)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (id_usuario, tipo, fecha, calificacion, aprobado))
+            INSERT INTO intentos (id_usuario, tipo, id_simulador, fecha, calificacion, aprobado)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (id_usuario, tipo, id_simulador, fecha, calificacion, aprobado))
+
         self.conn.commit()
         cur.close()
+
