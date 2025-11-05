@@ -5,41 +5,47 @@ class DBManager:
     def __init__(self):
         self.conn = mysql.connector.connect(
             host="localhost",
-            user="root",          # usuario por defecto en XAMPP
-            password="",          # vacío si no configuraste contraseña
-            database="simulador_manejo"  # nombre de tu BD
+            user="root",          
+            password="",          
+            database="simulador_manejo"
         )
         print("✅ Conexión a la base de datos establecida correctamente.")
 
     # --------------------------------------------------------
-    # Registrar o recuperar usuario
+    # Registrar o recuperar usuario (versión simple)
     # --------------------------------------------------------
-    def registrar_usuario(self, nombre):
+    def registrar_usuario(self, nombre, email, password):
         cur = self.conn.cursor()
 
-        # Buscar si el usuario ya existe
-        cur.execute("SELECT id_usuario FROM usuarios WHERE nombre = %s", (nombre,))
+        cur.execute("SELECT id_usuario FROM usuarios WHERE email = %s", (email,))
         result = cur.fetchone()
 
         if result:
-            user_id = result[0]
-            print(f"Usuario existente con ID {user_id}")
+            print("⚠️ El usuario ya existe.")
+            cur.close()
+            return False
         else:
-            # Generar correo único para evitar duplicados
-            email = f"{nombre.lower()}@simulacion.com"
             cur.execute(
                 "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)",
-                (nombre, email, "")
+                (nombre, email, password)
             )
             self.conn.commit()
-            user_id = cur.lastrowid
-            print(f"Nuevo usuario registrado con ID {user_id}")
-
-        cur.close()
-        return user_id
+            print(f"✅ Usuario '{nombre}' registrado correctamente.")
+            cur.close()
+            return True
 
     # --------------------------------------------------------
-    # Contar intentos previos de un usuario
+    # Validar login
+    # --------------------------------------------------------
+    def validar_login(self, email, password):
+        cur = self.conn.cursor(dictionary=True)
+        cur.execute("SELECT * FROM usuarios WHERE email = %s AND password = %s", (email, password))
+        user = cur.fetchone()
+        cur.close()
+        return user
+
+    # --------------------------------------------------------
+    # Contar intentos previos
     # --------------------------------------------------------
     def contar_intentos(self, id_usuario, tipo):
         cur = self.conn.cursor()
