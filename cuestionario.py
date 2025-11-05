@@ -41,7 +41,7 @@ class Cuestionario:
                 label_tiempo.config(text=f"Tiempo restante: {tiempo_restante[0]}s")
                 timer_id[0] = root.after(1000, actualizar_tiempo)
             else:
-                on_button_click()  # sin respuesta → error
+                on_button_click() 
 
         def mostrar_pregunta():
             pregunta = self.df.iloc[num_preguntas[n_preg]]
@@ -64,14 +64,18 @@ class Cuestionario:
                 root.after_cancel(timer_id[0])
 
             # Verificar respuesta
-            try:
-                respuesta_correcta = self.df['respuesta'].iloc[num_preguntas[n_preg]-1]
-                respuesta_usuario = selected_option.get()
-                if respuesta_usuario != respuesta_correcta:
-                    self.errores += 1
-            except IndexError:
-                print(f"⚠️ Índice fuera de rango en pregunta {n_preg}")
-                return
+            respuesta_correcta = self.df['respuesta'].iloc[num_preguntas[n_preg]]
+            respuesta_usuario = selected_option.get()
+            print(respuesta_correcta)
+            print(respuesta_usuario)
+            if respuesta_correcta == respuesta_usuario :
+                print("correcta")
+            elif respuesta_usuario != respuesta_correcta :
+                print("incorrecta")
+                self.errores += 1
+            else:
+                print(f"Índice fuera de rango en pregunta {n_preg}")
+           
 
             n_preg += 1
 
@@ -85,17 +89,17 @@ class Cuestionario:
         mostrar_pregunta()
         root.mainloop()
 
-    # ✅ Método FINALIZAR agregado
+    # Método FINALIZAR agregado
     def finalizar(self, root, usuario_id, tipo, total):
         puntos = 5 if tipo == "practica" else 2.5
         puntaje = ((total - self.errores) * puntos)
         porcentaje = (puntaje / (total * puntos)) * 100
         aprobado = 1 if porcentaje >= 75 else 0
 
-        # Registrar el intento en la base de datos (usa DBManager)
+        # Registrar el intento en la base de datos
         self.db.registrar_intento(usuario_id, tipo, porcentaje, aprobado)
 
-        resultado = "Aprobado ✅" if aprobado else "No aprobado ❌"
+        resultado = "Aprobado" if aprobado else "No aprobado"
         tk.Label(root, text=f"Resultado: {resultado}", font=("Arial", 14, "bold")).pack(pady=10)
         tk.Label(root, text=f"Calificación: {porcentaje:.2f}%", font=("Arial", 12)).pack(pady=5)
         tk.Button(root, text="Finalizar", command=root.destroy).pack(pady=15)

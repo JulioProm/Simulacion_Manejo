@@ -10,7 +10,6 @@ class LoginWindow:
         self.root.geometry("400x300")
         self.root.configure(bg="#2c3e50")
 
-        # 👇 IMPORTANTE: usar DBManager (no UserManager)
         self.db = DBManager()
 
         tk.Label(root, text="Simulador de Examen de Manejo",
@@ -40,13 +39,12 @@ class LoginWindow:
         if not email or not password:
             messagebox.showwarning("Faltan datos", "Ingresa correo y contraseña.")
             return
-
-        # 👇 usar DBManager
+        
         usuario = self.db.validar_login(email, password)
         if usuario:
-            self.usuario_logeado = usuario        # <- para que main.py lo lea
+            self.usuario_logeado = usuario        
             messagebox.showinfo("Éxito", f"Bienvenido, {usuario['nombre']}!")
-            self.root.destroy()                   # cierra login
+            self.root.destroy()        
         else:
             messagebox.showerror("Error", "Credenciales incorrectas.")
 
@@ -58,7 +56,6 @@ class LoginWindow:
             return
 
         nombre = email.split("@")[0].capitalize()
-        # 👇 usar el método que agregaste en DBManager
         ok = self.db.registrar_usuario_login(nombre, email, password)
         if ok:
             messagebox.showinfo("Registro", "Usuario registrado correctamente. Ya puedes iniciar sesión.")

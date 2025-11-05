@@ -4,16 +4,16 @@ from menu_modo import MenuModo
 import tkinter as tk
 
 def main():
-    # 1) Ventana de login
+    # Ventana de login
     root = tk.Tk()
     login_app = LoginWindow(root)
     root.mainloop()
 
-    # 2) Si el login fue exitoso, abre el menú gráfico de modos
+    # Si el login fue exitoso, abre el menú gráfico de modos
     if hasattr(login_app, "usuario_logeado"):
         MenuModo(login_app.usuario_logeado)
     else:
-        print("❌ No se inició sesión.")
+        print("No se inició sesión.")
 
 if __name__ == "__main__":
     main()

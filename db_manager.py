@@ -9,10 +9,10 @@ class DBManager:
             password="",          
             database="simulador_manejo"
         )
-        print("✅ Conexión a la base de datos establecida correctamente.")
+        print("Conexión a la base de datos establecida correctamente.")
 
     # --------------------------------------------------------
-    # Registrar o recuperar usuario (versión simple)
+    # Registrar o recuperar usuario
     # --------------------------------------------------------
     def registrar_usuario(self, nombre, email, password):
         cur = self.conn.cursor()
@@ -21,7 +21,7 @@ class DBManager:
         result = cur.fetchone()
 
         if result:
-            print("⚠️ El usuario ya existe.")
+            print("El usuario ya existe.")
             cur.close()
             return False
         else:
@@ -30,7 +30,7 @@ class DBManager:
                 (nombre, email, password)
             )
             self.conn.commit()
-            print(f"✅ Usuario '{nombre}' registrado correctamente.")
+            print(f"Usuario '{nombre}' registrado correctamente.")
             cur.close()
             return True
 
@@ -53,12 +53,8 @@ class DBManager:
         total = cur.fetchone()[0]
         cur.close()
         return total
-
     # --------------------------------------------------------
     # Registrar un nuevo intento
-    # --------------------------------------------------------
-       # --------------------------------------------------------
-    # Registrar un nuevo intento (corrige la llave foránea)
     # --------------------------------------------------------
     def registrar_intento(self, id_usuario, tipo, calificacion, aprobado):
         cur = self.conn.cursor()
