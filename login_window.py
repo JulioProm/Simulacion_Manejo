@@ -56,7 +56,7 @@ class LoginWindow:
             return
 
         nombre = email.split("@")[0].capitalize()
-        ok = self.db.registrar_usuario_login(nombre, email, password)
+        ok = self.db.registrar_usuario(nombre, email, password)
         if ok:
             messagebox.showinfo("Registro", "Usuario registrado correctamente. Ya puedes iniciar sesión.")
         else:
