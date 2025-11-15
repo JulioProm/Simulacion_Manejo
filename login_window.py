@@ -43,7 +43,7 @@ class LoginWindow:
         usuario = self.db.validar_login(email, password)
         if usuario:
             self.usuario_logeado = usuario        
-            messagebox.showinfo("Éxito", f"Bienvenido, {usuario['nombre']}!")
+            
             self.root.destroy()        
         else:
             messagebox.showerror("Error", "Credenciales incorrectas.")
