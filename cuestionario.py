@@ -1,14 +1,30 @@
 import tkinter as tk
 import pandas as pd
+import os
+import sys
+from tkinter import messagebox
 import random
 from datetime import datetime
 from db_manager import DBManager
 
 class Cuestionario:
     def __init__(self, archivo_preguntas, db: DBManager):
-        self.df = pd.read_csv(archivo_preguntas, encoding='latin1').fillna("")
+        self.csv_path = archivo_preguntas
         self.db = db
         self.errores = 0
+
+        # ✔ Verificar si el archivo existe ANTES de cargarlo
+        if not os.path.exists(self.csv_path):
+            messagebox.showerror(
+                "Error",
+                "No se encontraron las preguntas.\n"
+                "El archivo preguntas.csv no existe.\n"
+                "La aplicación se cerrará."
+            )
+            sys.exit()
+
+        # ✔ Cargar preguntas una vez validado el archivo
+        self.df = pd.read_csv(self.csv_path, encoding='latin1').fillna("")
 
     def generar_lista(self, cantidad):
         return random.sample(range(1, len(self.df)), cantidad)
@@ -41,7 +57,7 @@ class Cuestionario:
                 label_tiempo.config(text=f"Tiempo restante: {tiempo_restante[0]}s")
                 timer_id[0] = root.after(1000, actualizar_tiempo)
             else:
-                on_button_click() 
+                on_button_click()
 
         def mostrar_pregunta():
             pregunta = self.df.iloc[num_preguntas[n_preg]]
@@ -59,62 +75,43 @@ class Cuestionario:
         def on_button_click():
             nonlocal n_preg
 
-            # Detener temporizador si está activo
             if timer_id[0]:
                 root.after_cancel(timer_id[0])
 
-            # Verificar respuesta
             respuesta_correcta = self.df['respuesta'].iloc[num_preguntas[n_preg]]
             respuesta_usuario = selected_option.get()
-            print(respuesta_correcta)
-            print(respuesta_usuario)
-            if respuesta_correcta == respuesta_usuario:
-                print("correcta")
-            elif respuesta_usuario != respuesta_correcta:
-                print("incorrecta")
+
+            if respuesta_correcta != respuesta_usuario:
                 self.errores += 1
-            else:
-                print(f"Índice fuera de rango en pregunta {n_preg}")
-           
+
             n_preg += 1
 
             if n_preg < len(num_preguntas):
                 mostrar_pregunta()
             else:
-                # Finalizar simulador
                 self.finalizar(root, usuario_id, tipo, len(num_preguntas))
 
         tk.Button(root, text="Siguiente", command=on_button_click).pack(pady=10)
         mostrar_pregunta()
         root.mainloop()
 
-    # --------------------------------------------------------
-    # Método FINALIZAR modificado para regresar al menú
-    # --------------------------------------------------------
     def finalizar(self, root, usuario_id, tipo, total):
-        from menu_modo import MenuModo  # <-- CAMBIO: import aquí para evitar ciclos
+        from menu_modo import MenuModo
 
         puntos = 5 if tipo == "practica" else 2.5
         puntaje = ((total - self.errores) * puntos)
         porcentaje = (puntaje / (total * puntos)) * 100
         aprobado = 1 if porcentaje >= 75 else 0
 
-        # Registrar el intento en la base de datos
         self.db.registrar_intento(usuario_id, tipo, porcentaje, aprobado)
 
         resultado = "Aprobado" if aprobado else "No aprobado"
         tk.Label(root, text=f"Resultado: {resultado}", font=("Arial", 14, "bold")).pack(pady=10)
         tk.Label(root, text=f"Calificación: {porcentaje:.2f}%", font=("Arial", 12)).pack(pady=5)
 
-        # --- FUNCIÓN PARA VOLVER AL MENÚ ---  # <-- CAMBIO IMPORTANTE
         def volver_menu():
-            # Cerrar solo la ventana del examen
             root.destroy()
-
-            # Recuperar el usuario desde la BD (diccionario con nombre, email, etc.)
             usuario = self.db.obtener_usuario(usuario_id)
-
-            # Volver a mostrar el menú principal con ese usuario
             MenuModo(usuario)
 
-        tk.Button(root, text="Finalizar", command=volver_menu).pack(pady=15)  # <-- CAMBIO: ya no root.destroy directo
+        tk.Button(root, text="Finalizar", command=volver_menu).pack(pady=15)

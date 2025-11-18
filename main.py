@@ -1,4 +1,3 @@
-# main.py
 from login_window import LoginWindow
 from menu_modo import MenuModo
 import tkinter as tk
