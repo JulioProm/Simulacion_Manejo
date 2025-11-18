@@ -29,7 +29,7 @@ class MenuModo:
         # Botón Práctica
         tk.Button(
             self.root,
-            text="🟩 Práctica",
+            text="Práctica",
             bg="#27ae60", fg="white",
             width=15, height=2,
             command=self.modo_practica
@@ -38,19 +38,19 @@ class MenuModo:
         # Botón Examen Final
         tk.Button(
             self.root,
-            text="🟦 Examen Final",
+            text="Examen Final",
             bg="#2980b9", fg="white",
             width=15, height=2,
             command=self.modo_final
         ).pack(pady=10)
 
         # ----------------------------------------------------------
-        # ✔ Botón Dashboard SOLO PARA ADMIN
+        # Botón Dashboard SOLO PARA ADMIN
         # ----------------------------------------------------------
         if self.usuario["rol"] == "admin":
             tk.Button(
                 self.root,
-                text="📊 Dashboard",
+                text="Dashboard",
                 bg="#f39c12",
                 fg="black",
                 width=15,
@@ -59,7 +59,7 @@ class MenuModo:
             ).pack(pady=10)
 
         # ----------------------------------------------------------
-        # ✔ Botón CERRAR SESIÓN (para ambos roles)
+        # Botón CERRAR SESIÓN
         # ----------------------------------------------------------
         tk.Button(
             self.root,
@@ -98,14 +98,14 @@ class MenuModo:
         cuestionario.iniciar(usuario_id, tipo, cantidad)
 
     # ----------------------------------------------------------------
-    # ✔ Abrir Dashboard (solo admin)
+    # Abrir Dashboard
     # ----------------------------------------------------------------
     def abrir_dashboard(self):
         from dashboard import Dashboard
         Dashboard(self.db)
 
     # ----------------------------------------------------------------
-    # ✔ Cerrar sesión (para ambos roles)
+    # Cerrar sesión
     # ----------------------------------------------------------------
     def cerrar_sesion(self):
         self.root.destroy()

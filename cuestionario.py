@@ -1,10 +1,10 @@
 import tkinter as tk
-import pandas as pd
+from tkinter import messagebox
 import os
 import sys
-from tkinter import messagebox
 import random
 from datetime import datetime
+import pandas as pd
 from db_manager import DBManager
 
 class Cuestionario:
@@ -13,7 +13,7 @@ class Cuestionario:
         self.db = db
         self.errores = 0
 
-        # ✔ Verificar si el archivo existe ANTES de cargarlo
+        # Verificar si el archivo existe ANTES de cargarlo
         if not os.path.exists(self.csv_path):
             messagebox.showerror(
                 "Error",
@@ -23,7 +23,7 @@ class Cuestionario:
             )
             sys.exit()
 
-        # ✔ Cargar preguntas una vez validado el archivo
+        # Cargar preguntas una vez validado el archivo
         self.df = pd.read_csv(self.csv_path, encoding='latin1').fillna("")
 
     def generar_lista(self, cantidad):
@@ -96,7 +96,7 @@ class Cuestionario:
         root.mainloop()
 
     def finalizar(self, root, usuario_id, tipo, total):
-        from menu_modo import MenuModo  # Evita ciclos al importarlo arriba
+        from menu_modo import MenuModo
 
         puntos = 5 if tipo == "practica" else 2.5
         puntaje = ((total - self.errores) * puntos)
@@ -104,7 +104,7 @@ class Cuestionario:
         aprobado = 1 if porcentaje >= 75 else 0
 
         # --------------------------------------------
-        # ✔ Intentar guardar el registro en la BD
+        # Intentar guardar el registro en la BD
         # --------------------------------------------
         try:
             self.db.registrar_intento(usuario_id, tipo, porcentaje, aprobado)

@@ -83,9 +83,9 @@ class DBManager:
         cur.close()
 
     # --------------------------------------------------------
-    # Obtener usuario por id (NUEVO)
+    # Obtener usuario por id
     # --------------------------------------------------------
-    def obtener_usuario(self, id_usuario):   # <-- CAMBIO NUEVO MÉTODO
+    def obtener_usuario(self, id_usuario): 
         """
         Regresa el registro completo del usuario como diccionario
         para poder reenviarlo a MenuModo.
