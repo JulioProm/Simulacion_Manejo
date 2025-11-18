@@ -96,15 +96,31 @@ class Cuestionario:
         root.mainloop()
 
     def finalizar(self, root, usuario_id, tipo, total):
-        from menu_modo import MenuModo
+        from menu_modo import MenuModo  # Evita ciclos al importarlo arriba
 
         puntos = 5 if tipo == "practica" else 2.5
         puntaje = ((total - self.errores) * puntos)
         porcentaje = (puntaje / (total * puntos)) * 100
         aprobado = 1 if porcentaje >= 75 else 0
 
-        self.db.registrar_intento(usuario_id, tipo, porcentaje, aprobado)
+        # --------------------------------------------
+        # ✔ Intentar guardar el registro en la BD
+        # --------------------------------------------
+        try:
+            self.db.registrar_intento(usuario_id, tipo, porcentaje, aprobado)
+        except Exception as e:
+            messagebox.showerror(
+                "Error al guardar",
+                "Ocurrió un error al guardar el intento en la base de datos.\n"
+                "La aplicación se cerrará."
+            )
+            print("ERROR BD:", e)  # Para debug
+            root.destroy()
+            sys.exit()
 
+        # --------------------------------------------
+        # Si no hubo error, continuar normal
+        # --------------------------------------------
         resultado = "Aprobado" if aprobado else "No aprobado"
         tk.Label(root, text=f"Resultado: {resultado}", font=("Arial", 14, "bold")).pack(pady=10)
         tk.Label(root, text=f"Calificación: {porcentaje:.2f}%", font=("Arial", 12)).pack(pady=5)
